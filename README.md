@@ -132,6 +132,19 @@ Pendekatan ini merekomendasikan buku berdasarkan kemiripan konten (judul).
     vectors_cv = vectorizer_cv.fit_transform(full_data["all_features"])
     similarity_cv = cosine_similarity(vectors_cv)
     ```
+##### Hasil (Result)
+
+Dalam kode, pengguna mencari rekomendasi berdasarkan buku "Stanislaski Sisters".
+
+| Book Title                                | Author        | Publisher   | Similarity Score |
+|-------------------------------------------|---------------|-------------|------------------|
+| Stanislaski Sisters                       | Nora Roberts  | Silhouette  | 1.000            |
+| Stanislaski Brothers (Silhouette Promo)   | Nora Roberts  | Silhouette  | 0.745            |
+| Mysterious                                | Nora Roberts  | Silhouette  | 0.671            |
+| Summer Pleasures                          | Nora Roberts  | Silhouette  | 0.600            |
+| Cordina's Crown Jewel                     | Nora Roberts  | Silhouette  | 0.548            |
+
+Semua hasil yang direkomendasikan memiliki kesamaan tinggi dalam hal penulis dan penerbit, menunjukkan efektivitas pendekatan berbasis konten (content-based filtering) dalam menyarankan buku-buku yang serupa
 
 ### 2. TfidfVectorizer
 - Menggunakan bobot TF-IDF untuk memberi nilai penting pada kata-kata unik.
@@ -142,6 +155,18 @@ Pendekatan ini merekomendasikan buku berdasarkan kemiripan konten (judul).
     vectors_tv = vectorizer_tv.fit_transform(full_data["all_features"])
     similarity_tv = cosine_similarity(vectors_tv)
     ```
+##### Hasil (Result)
+Dengan input buku "Stanislaski Sisters", sistem juga memberikan hasil yang serupa, namun skor kemiripan bisa sedikit berbeda tergantung bobot kata
+
+| Book Title                                | Author        | Publisher   | Similarity Score |
+|-------------------------------------------|---------------|-------------|------------------|
+| Stanislaski Sisters                       | Nora Roberts  | Silhouette  | 1.000            |
+| Stanislaski Brothers (Silhouette Promo)   | Nora Roberts  | Silhouette  | 0.683            |
+| Mysterious                                | Nora Roberts  | Silhouette  | 0.516            |
+| Time And Again                            | Nora Roberts  | Silhouette  | 0.469            |
+| Summer Pleasures                          | Nora Roberts  | Silhouette  | 0.451            |
+
+Rekomendasi yang dihasilkan menunjukkan bahwa pendekatan TF-IDF berhasil mengidentifikasi buku-buku dengan kemiripan konten teks yang tinggi.
 
 ### Collaborative Filtering
 
@@ -168,7 +193,7 @@ class RecommenderNet(tf.keras.Model):
 
 # Evaluation
 
-### Metrik yang Digunakan - RMSE (Root Mean Squared Error)
+##### Metrik yang Digunakan - RMSE (Root Mean Squared Error)
 
 Rumus:
 
@@ -179,7 +204,7 @@ RMSE = √(1/n ∑(yᵢ - ŷᵢ)²)
 - RMSE rendah menandakan prediksi model mendekati rating aktual pengguna.
 - Digunakan untuk mengevaluasi performa model collaborative filtering selama proses training dan validasi.
 
-### Hasil Evaluasi:
+##### Hasil Evaluasi:
 
 - RMSE Awal (Epoch 1):
   - Train: ≈ 0.31
@@ -189,6 +214,33 @@ RMSE = √(1/n ∑(yᵢ - ŷᵢ)²)
   - Validation: ≈ 0.27
 
 **Train RMSE** menunjukkan penurunan yang signifikan dan konsisten, dari sekitar 0.31 menjadi sekitar 0.04, yang mengindikasikan bahwa model mampu mempelajari pola dari data pelatihan dengan sangat baik. **Validation RMSE** juga menurun, namun dengan laju yang lebih lambat. Pada akhir epoch, nilai RMSE validasi berada di sekitar 0.27.
+
+##### Hasil (Result
+Hasil Rekomendasi Buku untuk User ID: 162052
+Buku-Buku dengan Rating Tinggi dari User
+| No. | ISBN         | Judul Buku                                                               |
+|-----|--------------|---------------------------------------------------------------------------|
+| 1   | 0836217012   | *Cows Of Our Planet (Far Side Series)*                                   |
+| 2   | 0553279556   | *E Is for Evidence: A Kinsey Millhone Mystery (Kinsey Millhone Mysteries)*|
+| 3   | 0863501427   | *John Cleare's Fifty Best Hill Walks of Britain*                         |
+| 4   | 8427932081   | *Orillas del río Plum*                                                   |
+| 5   | 089802630X   | *Fishing With Peter = Pescando Con Pedro (Riven Rock Spanish Edition)*   |
+Topp 10 Rekomendasi Buku
+| No. | ISBN         | Judul Buku                                                                 |
+|-----|--------------|-----------------------------------------------------------------------------|
+| 1   | 0671705091   | *A Knight in Shining Armor*                                                 |
+| 2   | 0671741039   | *Swan Song*                                                                 |
+| 3   | 0842329218   | *Tribulation Force: The Continuing Drama of Those Left Behind*             |
+| 4   | 0684835983   | *Before I Say Good-Bye : A Novel*                                           |
+| 5   | 0671776134   | *Plain Truth*                                                               |
+| 6   | 0064407683   | *The Wide Window (A Series of Unfortunate Events, Book 3)*                 |
+| 7   | 0671729454   | *If There Be Thorns (Dollanganger Series)*                                 |
+| 8   | 0312890044   | *Moonheart (Newford)*                                                       |
+| 9   | 0679723161   | *Lolita (Vintage International)*                                            |
+| 10  | 0553263226   | *The Bourne Supremacy*                                                      |
+
+Model berhasil merekomendasikan buku yang sejalan dengan minat user berdasarkan histori rating yang diberikan. Buku-buku yang direkomendasikan mencakup genre fiksi, misteri, fantasi, hingga thriller, yang cocok dengan preferensi pembaca berdasarkan buku yang telah dinilai tinggi sebelumnya.
+
 
 ## Kesimpulan
 
