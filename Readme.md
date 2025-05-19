@@ -400,7 +400,7 @@ Model berhasil merekomendasikan buku yang sejalan dengan minat user berdasarkan 
 # Evaluation
 
 ### Evalusasi Model
-##### Content-Based Filtering – Top-K Ranking Metrics
+#### Content-Based Filtering – Top-K Ranking Metrics
 Content-based tidak menggunakan rating eksplisit, sehingga evaluasi lebih fokus pada relevansi hasil rekomendasi. Berikut adalah metrik evaluasi yang sesuai (belum seluruhnya diimplementasikan dalam kode, tapi menjadi rujukan penting ke depan):
 - Precision@K: Seberapa banyak dari top-K rekomendasi yang relevan.
 - Recall@K: Seberapa banyak item relevan berhasil ditemukan dari seluruh item relevan.
@@ -438,7 +438,7 @@ Hasil evaluasi metrik content based filtering
 
 Hasil evaluasi menunjukkan bahwa TF-IDF Vectorizer memberikan performa yang lebih unggul dibanding CountVectorizer pada ketiga metrik utama: Precision, Recall, dan F1-Score. Nilai Recall sebesar 1.00 menandakan bahwa semua item relevan berhasil direkomendasikan, dan F1-Score yang tinggi mencerminkan keseimbangan antara ketepatan dan kelengkapan sistem rekomendasi ini.
 
-##### Collaborative Filtering - RMSE (Root Mean Squared Error)
+#### Collaborative Filtering - RMSE (Root Mean Squared Error)
 Rumus Evaluasi:
 
 ```
