@@ -297,7 +297,7 @@ Digunakan Cosine Similarity untuk mengukur kedekatan antar-vektor, Cosine simila
     ```
 #### Hasil (Result)
 
-Dalam kode, pengguna mencari rekomendasi berdasarkan buku "Stanislaski Sisters".
+Top 5 Book Recommendations berdasarkan buku "Stanislaski Sisters"
 
 | Book Title                                | Author        | Publisher   | Similarity Score |
 |-------------------------------------------|---------------|-------------|------------------|
@@ -325,7 +325,8 @@ Masih menggunakan Cosine Similarity.
     similarity_tv = cosine_similarity(vectors_tv)
     ```
 ##### Hasil (Result)
-Dengan input buku "Stanislaski Sisters", sistem juga memberikan hasil yang serupa, namun skor kemiripan bisa sedikit berbeda tergantung bobot kata
+
+Top 5 Book Recommendations berdasarkan buku "Stanislaski Sisters"
 
 | Book Title                                | Author        | Publisher   | Similarity Score |
 |-------------------------------------------|---------------|-------------|------------------|
