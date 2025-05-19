@@ -437,7 +437,7 @@ Hasil evaluasi metrik content based filtering
 
 Hasil evaluasi menunjukkan bahwa TF-IDF Vectorizer memberikan performa yang lebih unggul dibanding CountVectorizer pada ketiga metrik utama: Precision, Recall, dan F1-Score. Nilai Recall sebesar 1.00 menandakan bahwa semua item relevan berhasil direkomendasikan, dan F1-Score yang tinggi mencerminkan keseimbangan antara ketepatan dan kelengkapan sistem rekomendasi ini.
 
-
+##### Collaborative Filtering - RMSE (Root Mean Squared Error)
 Rumus Evaluasi:
 
 ```
