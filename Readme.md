@@ -45,7 +45,7 @@ Dataset ini terdiri dari tiga file utama:
 | Dataset   | Jumlah Baris | Jumlah Kolom | Deskripsi Singkat                                    |
 |-----------|---------------|--------------|------------------------------------------------------|
 | Users     | 278.858       | 3            | Data pengguna seperti User-ID, Location, dan Age     |
-| Books     | 271.379       | 8            | Informasi buku seperti ISBN, Judul, Penulis, dll     |
+| Books     | 271.360       | 8            | Informasi buku seperti ISBN, Judul, Penulis, dll     |
 | Ratings   | 1.149.780     | 3            | Data interaksi berupa User-ID, ISBN, dan Rating      |
 
 ### 2. Penjelasan Fitur dan Kondisinya
@@ -241,23 +241,39 @@ Alasan:
     max_rating = df_collab['rating'].max()
     y = df_collab['rating'].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
     ```
+### 5. Feature Extraction
+Tahapan ini dilakukan khusus untuk metode Content-Based Filtering, di mana teks pada kolom all_features diubah menjadi representasi vektor numerik menggunakan dua pendekatan:
+- CountVectorizer (Menghitung frekuensi setiap kata dalam dokumen).
+    ```python
+    vectorizer_cv = CountVectorizer()
+    vectors_cv = vectorizer_cv.fit_transform(full_data["all_features"])
+    ```
+- TfidfVectorizer (Menghitung bobot kata berdasarkan frekuensi kata dan seberapa unik kata tersebut antar dokumen).
+    ```python
+    vectorizer_tv = TfidfVectorizer()
+    vectors_tv = vectorizer_tv.fit_transform(full_data["all_features"])
+    ```
 
-### 5. Train-Test Split
+### 6. Data Spliting
 - Data diacak agar distribusi data tidak bias.
-- Dibagi menjadi 80% data latih dan 20% data validasi.
-     ```python
+- Membuat variabel x dan y
+- Dibagi menjadi 60% data latih, 20% data validasi, dan 20% data test.
+    ```python
     df_collab = df_collab.sample(frac=1, random_state=42)
+
     x = df_collab[['user', 'book']].values
-    train_size = int(0.8 * len(df_collab))
-    x_train, x_val = x[:train_size], x[train_size:]
-    y_train, y_val = y[:train_size], y[train_size:]
+    y = df_collab['rating'].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+
+    x_temp, x_test, y_temp, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+    x_train, x_val, y_train, y_val = train_test_split(x_temp, y_temp, test_size=0.25, random_state=42)
     ```
 
 ##### Alasan dan Tujuan
 - Sampling: Mempercepat eksperimen awal dengan mengurangi jumlah data.
 - Encoding ID: Agar ID pengguna dan buku bisa diproses oleh model sebagai input numerik.
 - Normalisasi: Membantu model belajar lebih cepat dan stabil.
-- Train-Test Split: Penting untuk mengukur performa model dalam memprediksi data baru (unseen data).
+- Feature Extraction: Mengubah teks menjadi vektor numerik yang dapat dihitung kemiripannya
+- Data Spliting: Penting untuk mengukur performa model dalam memprediksi data baru (unseen data).
 
 ## Modeling
 
@@ -291,8 +307,6 @@ Digunakan Cosine Similarity untuk mengukur kedekatan antar-vektor, Cosine simila
 #### Implementasi
 
     ```python
-    vectorizer_cv = CountVectorizer()
-    vectors_cv = vectorizer_cv.fit_transform(full_data["all_features"])
     similarity_cv = cosine_similarity(vectors_cv)
     ```
 #### Hasil (Result)
@@ -320,8 +334,6 @@ Masih menggunakan Cosine Similarity.
 
 #### Implementasi
     ```python
-    vectorizer_tv = TfidfVectorizer()
-    vectors_tv = vectorizer_tv.fit_transform(full_data["all_features"])
     similarity_tv = cosine_similarity(vectors_tv)
     ```
 ##### Hasil (Result)
@@ -370,30 +382,28 @@ class RecommenderNet(tf.keras.Model):
 - Semakin tinggi nilai sigmoid(dot_product), semakin besar kemungkinan user akan menyukai buku tersebut.
 
 #### Hasil (Result)
-Hasil Rekomendasi Buku untuk User ID: 211426
+Hasil Rekomendasi Buku untuk User ID: 36609
 Buku-Buku dengan Rating Tinggi dari User
-| No. | ISBN        | Book Title                                                       |
-|-----|-------------|-------------------------------------------------------------------|
-| 1   | 0345337662  | *Interview with the Vampire*                                     |
-| 2   | 0060973897  | *Lakota Woman*                                                   |
-| 3   | 0140236864  | *The Penguin Gandhi Reader*                                      |
-| 4   | 0671617028  | *The Color Purple*                                               |
-| 5   | 080213095X  | *World of the Buddha: An Introduction to Buddhist Literature*    |
+| No. | ISBN        | Book Title                                      |
+|-----|-------------|--------------------------------------------------|
+| 1   | 0684833131  | *Certain Poor Shepherds*                         |
+| 2   | 0375416641  | *While I Was Gone (Abridged)*                    |
+| 3   | 061810450X  | *The Wind Done Gone: A Novel*                    |
 
 Top 10 Book Recommendations
 
-| No. | ISBN        | Book Title                                                                 |
-|-----|-------------|-----------------------------------------------------------------------------|
-| 1   | 0385316895  | *Legacy of Silence*                                                         |
-| 2   | 0671003364  | *Ransom*                                                                    |
-| 3   | 0671705091  | *A Knight in Shining Armor*                                                 |
-| 4   | 0671741039  | *Swan Song*                                                                 |
-| 5   | 0842329218  | *Tribulation Force: The Continuing Drama of Those Left Behind*             |
-| 6   | 0684835983  | *Before I Say Good-Bye: A Novel*                                            |
-| 7   | 0786868015  | *The Diary of Ellen Rimbauer: My Life at Rose Red*                         |
-| 8   | 1558748865  | *Chicken Soup for the Gardener's Soul*                                     |
-| 9   | 0064407683  | *The Wide Window (A Series of Unfortunate Events, Book 3)*                 |
-| 10  | 0941524841  | *Empowerment Through Reiki*                                                |
+| No. | ISBN        | Book Title                                                                  |
+|-----|-------------|-------------------------------------------------------------------------------|
+| 1   | 0385316895  | *Legacy of Silence*                                                          |
+| 2   | 0671003364  | *Ransom*                                                                     |
+| 3   | 0671741039  | *Swan Song*                                                                  |
+| 4   | 0140119906  | *Love in the Time of Cholera (Penguin Great Books of the 20th Century)*      |
+| 5   | 039592720X  | *Interpreter of Maladies*                                                    |
+| 6   | 0441001971  | *Circus of the Damned (Anita Blake Vampire Hunter, Book 3)*                  |
+| 7   | 0446692298  | *Fat Girls and Lawn Chairs*                                                  |
+| 8   | 0671776134  | *Plain Truth*                                                                |
+| 9   | 0345339703  | *The Fellowship of the Ring (The Lord of the Rings, Part 1)*                 |
+| 10  | 0941524841  | *Empowerment Through Reiki*                                                  |
 
 Model berhasil merekomendasikan buku yang sejalan dengan minat user berdasarkan histori rating yang diberikan. Buku-buku yang direkomendasikan mencakup genre fiksi, misteri, fantasi, hingga thriller, yang cocok dengan preferensi pembaca berdasarkan buku yang telah dinilai tinggi sebelumnya.
 
@@ -455,10 +465,19 @@ Buku yang digunakan sebagai acuan rekomendasi:
 Hasil evaluasi training model collaborative filtering:
 | Epoch | Train RMSE | Validation RMSE |
 |-------|------------|-----------------|
-| 1     | ≈ 0.31     | ≈ 0.30          |
-| 100   | ≈ 0.04     | ≈ 0.27          |
+| 1     | ≈ 0.31     | ≈ 0.31          |
+| 100   | ≈ 0.04     | ≈ 0.28          |
 
-Train RMSE menunjukkan penurunan yang signifikan dan konsisten, dari sekitar 0.31 menjadi sekitar 0.04, yang mengindikasikan bahwa model mampu mempelajari pola dari data pelatihan dengan sangat baik. Validation RMSE juga menurun, namun dengan laju yang lebih lambat. Pada akhir epoch, nilai RMSE validasi berada di sekitar 0.27.
+Hasil evaluasi testing model collaborative filtering:
+| **Jumlah Batch (63/63)** | **Waktu (approx.)**     | **Loss** | **Root Mean Squared Error (RMSE)** |
+|--------------------------|--------------------------|----------|------------------------------------|
+| 63 batch                 | 1 detik (6ms/step)       | 0.6586   | 0.2923                             |
+
+**Test RMSE: 0.2910**
+
+Train RMSE menunjukkan penurunan yang signifikan dan konsisten, dari sekitar 0.31 menjadi sekitar 0.04, yang mengindikasikan bahwa model mampu mempelajari pola dari data pelatihan dengan sangat baik. Validation RMSE juga menurun, namun dengan laju yang lebih lambat. Pada akhir epoch, nilai RMSE validasi berada di sekitar 0.28.
+
+Pada proses pengujian akhir (testing), model menghasilkan nilai Test RMSE sebesar 0.2910, yang tergolong rendah. Ini menandakan bahwa prediksi rating model cukup akurat terhadap preferensi pengguna yang sebenarnya. Performa model yang stabil di ketiga tahap (train, validation, dan test) menunjukkan bahwa pendekatan collaborative filtering ini efektif dalam memahami pola interaksi pengguna dan dapat digunakan untuk memberikan rekomendasi yang personal dan relevan
 
 ### Hubungan dengan Business Understanding
 Model yang dievaluasi dalam proyek ini menunjukkan dampak yang relevan dan signifikan terhadap elemen-elemen utama dalam Business Understanding, yaitu problem statement, goals, dan solution statement.
@@ -467,11 +486,11 @@ Model yang dievaluasi dalam proyek ini menunjukkan dampak yang relevan dan signi
 - **Bagaimana membangun sistem rekomendasi buku yang mampu memberikan saran buku berdasarkan judul buku?**
 Model Content-Based Filtering berhasil menjawab tantangan ini dengan memanfaatkan representasi fitur teks (CountVectorizer dan TfidfVectorizer). Evaluasi menunjukkan bahwa model dapat merekomendasikan buku yang mirip secara konten terhadap buku yang disukai pengguna.
 - **Bagaimana membangun sistem rekomendasi buku yang mampu memberikan saran buku berdasarkan interaksi pengguna sebelumnya?**
-Model Collaborative Filtering berbasis neural network mampu mempelajari preferensi pengguna melalui histori rating dan memberikan rekomendasi yang relevan. Hal ini terbukti dari nilai RMSE yang rendah pada data validasi.
+Model Collaborative Filtering berbasis neural network mampu mempelajari preferensi pengguna melalui histori rating dan memberikan rekomendasi yang relevan. Hal ini terbukti dari nilai RMSE yang rendah pada data testing.
 
 ##### Apakah Goals Tercapai?
 - Kedua pendekatan berhasil diimplementasikan. Content-Based Filtering menangani cold start dan memberi rekomendasi berbasis konten, sementara Collaborative Filtering memberikan rekomendasi berdasarkan pola interaksi pengguna.
-- Model Collaborative Filtering menunjukkan performa yang baik dengan RMSE validasi sekitar 0.27, sementara Content-Based Filtering mencapai metrik evaluasi Precision, Recall, dan F1-Score yang tinggi, khususnya dengan TfidfVectorizer.
+- Model Collaborative Filtering menunjukkan performa yang baik dengan RMSE testing sekitar 0.29, sementara Content-Based Filtering mencapai metrik evaluasi Precision, Recall, dan F1-Score yang tinggi, khususnya dengan TfidfVectorizer.
 - Rekomendasi yang dihasilkan mencerminkan preferensi pengguna berdasarkan data historis dan konten, sesuai dengan tujuan sistem rekomendasi personalisasi.
 
 ##### Apakah Setiap Solusi Statement Berdampak?
@@ -480,6 +499,6 @@ Model Collaborative Filtering berbasis neural network mampu mempelajari preferen
 
 ### Kesimpulan
 
-Proyek ini berhasil membuktikan bahwa sistem rekomendasi hybrid dengan content-based dan collaborative filtering dapat dibangun untuk meningkatkan pengalaman pengguna dalam memilih buku. Evaluasi menunjukkan bahwa:
+Proyek ini berhasil membuktikan bahwa sistem rekomendasi dengan content-based dan collaborative filtering dapat dibangun untuk meningkatkan pengalaman pengguna dalam memilih buku. Evaluasi menunjukkan bahwa:
 - Collaborative filtering memberikan prediksi akurat terhadap rating (RMSE rendah).
 - Content-based filtering memberikan alternatif relevan, terutama saat data pengguna terbatas.
